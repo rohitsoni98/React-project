@@ -2,48 +2,51 @@ import { useState, useEffect, useMemo } from "react";
 import FilterCompo from "./FilterCompo";
 
 const App = () => {
-  const [item, setItem] = useState({
+  const [state, setState] = useState({
     list: [],
     filterValue: "",
     filterTag: "",
     isBtn: false,
-    showTest: true
+    showTest: true,
   });
 
-
   const filterItem = useMemo(() => {
-    return item.list.filter((ele) => {
-      if (item.filterValue === "") {
-        return ele;
+    return state.list.filter((ele) => {
+      if (state.filterValue === "" && state.filterTag === "") {
+        return ele
       } else if (
-        ele.firstName.toLowerCase().includes(item.filterValue.toLowerCase()) ||
-        ele.email.toLowerCase().includes(item.filterValue.toLowerCase()) ||
-        ele.company.toLowerCase().includes(item.filterValue.toLowerCase()) ||
-        ele.skill.toLowerCase().includes(item.filterValue.toLowerCase())
+        ele.firstName.toLowerCase().includes(state.filterValue.toLowerCase()) ||
+        ele.lastName.toLowerCase().includes(state.filterValue.toLowerCase()) &&
+        ele.tags.find((item) => {
+          return item.toLowerCase().includes(state.filterTag.toLowerCase())
+        })
       ) {
         return ele;
       }
-    })
-  }, [item, item.filterValue])
+    });
+  }, [state]);
 
   useEffect(() => {
-    const fetchData = () => {
-      fetch("https://api.hatchways.io/assessment/students")
+    const fetchData = async () => {
+      let list = await fetch("https://api.hatchways.io/assessment/students")
         .then((resp) => resp.json())
         .then((itm) => {
-          setItem((prevState) => ({ ...prevState, list: itm.students }));
+          const result = itm.students;
+          return result
         });
+
+      let newList = list.map((items) => {
+        return { ...items, tags: [] }
+      })
+      setState((preState) => ({ ...preState, list: newList }))
     };
     fetchData();
   }, []);
 
-
   const handleChange = (e) => {
     const value = e.target.value;
-    setItem((prevState) => ({ ...prevState, filterValue: value }))
-  }
-
-
+    setState((prevState) => ({ ...prevState, filterValue: value }));
+  };
 
   return (
     <div className="App">
@@ -51,25 +54,30 @@ const App = () => {
         className="inputText"
         type="text"
         placeholder="Search by name"
-        value={item.filterValue}
+        value={state.filterValue}
         onChange={handleChange}
       />
-      {
-        filterItem.map((element, index) => {
-          return (
-            <FilterCompo
-              element={element}
-              setItem={setItem}
-              item={item}
-              list={item.list}
-              key={index}
-            />
-          )
-        })
-      }
+      <input
+        className="inputText"
+        type="text"
+        placeholder="Search by tag"
+        value={state.filterTag}
+        onChange={(e) =>
+          setState((preState) => ({ ...preState, filterTag: e.target.value }))
+        }
+      />
+      {filterItem.map((element, index) => {
+        return (
+          <FilterCompo
+            element={element}
+            setState={setState}
+            list={state.list}
+            key={index}
+          />
+        );
+      })}
     </div>
   );
 };
 
 export default App;
-
