@@ -1,27 +1,35 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 
 
-const FilterCompo = ({ element, id, setItem, list }) => {
+const FilterCompo = ({ element, id, list, setState }) => {
 
-	const [tagItem, setTagItem] = useState([]);
-	const [tagValue, setTagValue] = useState("");
 	const [show, setShow] = useState(false);
+	const [tagValue, setTagValue] = useState("")
 
-	const handleBtnIcon = () => {
-		setTagItem((oldItems) => ([...oldItems, tagValue]));
+	const handleBtnIcon = (val) => {
+		let newList = list.map(ele => {
+			if (ele.id === val.id) {
+				return {
+					...ele,
+					tags: [...ele.tags, tagValue]
+				}
+			} else {
+				return ele;
+			}
+		})
+		setState((preState) => ({ ...preState, list: newList }))
+		console.log(newList[0].tags)
 		setTagValue("");
 	}
-
-
 
 	return (
 		<div key={id}>
 			<div className="flexBox">
 				<div className="leftBox">
-					<img src={element.pic} />
+					<img src={element.pic} alt="logo" />
 				</div>
 				<div className="rightBox">
-					<h1>{element.firstName}</h1>
+					<h1>{element.firstName} {element.lastName}</h1>
 					<div className="subItem">
 						<p>Email : {element.email}</p>
 						<p>Company : {element.company}</p>
@@ -44,12 +52,13 @@ const FilterCompo = ({ element, id, setItem, list }) => {
 						}
 
 						{
-							tagItem.map((ele, index) => {
+							element.tags.map((ele, index) => {
 								return (
 									<p className="tagPara" key={index}>{ele}</p>
 								)
 							})
 						}
+
 						<input
 							className="inputTag"
 							type="text"
@@ -57,7 +66,7 @@ const FilterCompo = ({ element, id, setItem, list }) => {
 							value={tagValue}
 							onChange={(e) => setTagValue(e.target.value)}
 						/>
-						<i className="btnIcon" onClick={handleBtnIcon}>
+						<i className="btnIcon" onClick={() => handleBtnIcon(element)}>
 							+
 						</i>
 					</div>
