@@ -16,7 +16,7 @@ const App = () => {
         return ele
       } else if (
         (ele.firstName.toLowerCase().includes(state.filterValue.toLowerCase()) ||
-        ele.lastName.toLowerCase().includes(state.filterValue.toLowerCase())) &&
+          ele.lastName.toLowerCase().includes(state.filterValue.toLowerCase())) &&
         ele.tags.find((item) => {
           return item.toLowerCase().includes(state.filterTag.toLowerCase())
         })
