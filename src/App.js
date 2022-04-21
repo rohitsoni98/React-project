@@ -6,24 +6,19 @@ const App = () => {
     list: [],
     filterValue: "",
     filterTag: "",
-    isBtn: false,
-    showTest: true,
   });
 
   const filterItem = useMemo(() => {
-    return state.list.filter((ele) => {
-      if (state.filterValue === "" && state.filterTag === "") {
-        return ele
-      } else if (
-        (ele.firstName.toLowerCase().includes(state.filterValue.toLowerCase()) ||
-          ele.lastName.toLowerCase().includes(state.filterValue.toLowerCase())) &&
-        ele.tags.find((item) => {
-          return item.toLowerCase().includes(state.filterTag.toLowerCase())
-        })
-      ) {
-        return ele;
-      }
-    });
+    return state.filterValue === "" && state.filterTag === "" ? state.list :
+      state.list.filter((ele) => {
+        return (
+          `${ele.firstName}  ${ele.lastName}`.toLowerCase().includes(state.filterValue.toLowerCase()) &&
+          (state.filterTag === "" || ele.tags.find((item) => {
+            console.log(' item.toLowerCase().includes(state.filterTag.toLowerCase()): ', item.toLowerCase().includes(state.filterTag.toLowerCase()));
+            return item.toLowerCase().includes(state.filterTag.toLowerCase());
+          }))
+        )
+      });
   }, [state]);
 
   useEffect(() => {
@@ -32,13 +27,13 @@ const App = () => {
         .then((resp) => resp.json())
         .then((itm) => {
           const result = itm.students;
-          return result
+          return result;
         });
 
       let newList = list.map((items) => {
-        return { ...items, tags: [] }
-      })
-      setState((preState) => ({ ...preState, list: newList }))
+        return { ...items, tags: [] };
+      });
+      setState((preState) => ({ ...preState, list: newList }));
     };
     fetchData();
   }, []);
