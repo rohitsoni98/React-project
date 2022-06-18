@@ -22,6 +22,7 @@ const App = () => {
   }, [state]);
 
   useEffect(() => {
+    console.log("render")
     const fetchData = async () => {
       let list = await fetch("https://api.hatchways.io/assessment/students")
         .then((resp) => resp.json())
